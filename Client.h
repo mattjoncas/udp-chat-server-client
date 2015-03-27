@@ -12,6 +12,7 @@
 #include <netdb.h>
 #include <string>
 #include <iostream>
+#include <thread>
 
 #define SERVERPORT "4950"
 
@@ -23,7 +24,8 @@ public:
 	~Client();
 
 	bool Init(const char* host);
-	bool Run();
+	void Send();
+	void Recv();
 private:
 	int sockfd;
 	struct addrinfo hints, *servinfo, *p;
@@ -31,4 +33,6 @@ private:
 	int numbytes;
 
 	char buf[MAXBUFLEN];
+
+	bool running;
 };

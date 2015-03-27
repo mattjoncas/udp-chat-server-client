@@ -2,6 +2,8 @@
 #include "Caesar.h"
 
 Client::Client(){
+
+	running = true;
 	
 }
 Client::~Client(){
@@ -35,14 +37,14 @@ bool Client::Init(const char* host){
 	if ((numbytes = sendto(sockfd, msg.c_str(), strlen(msg.c_str()), 0, p->ai_addr, p->ai_addrlen)) == -1) {
        		perror("init sendto\n");
 	 	return false;
- 	}
+ 	}	
+	
 	return true;
 }
 
-bool Client::Run(){
+void Client::Send(){
 	std::string msg;
-
-	bool running = true;
+	
 	while(running){
 		getline(std::cin, msg);
 		if (msg == "exit"){
@@ -50,25 +52,27 @@ bool Client::Run(){
 			msg = "2";
 			if ((numbytes = sendto(sockfd, msg.c_str(), strlen(msg.c_str()), 0, p->ai_addr, p->ai_addrlen)) == -1) {
 				perror("sendto error\n");
-			 	return false;
 		 	}
 		}
 		else{
 			msg = Caesar::Encrypt(msg);
 			msg = "1" + msg;
 		 	if ((numbytes = sendto(sockfd, msg.c_str(), strlen(msg.c_str()), 0, p->ai_addr, p->ai_addrlen)) == -1) {
-		       	perror("sendto error\n");
-			 	return false;
+		       		perror("sendto error\n");
 		 	}
-			//get all pending messages
-			while ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0, p->ai_addr, &p->ai_addrlen)) != -1) { //NULL, NULL
-				buf[numbytes] = '\0';
-				printf("%s\n", buf);
-			}
 		}
 	}
 
     freeaddrinfo(servinfo);
     close(sockfd);
-    return true;
+}
+
+void Client::Recv(){
+	while (running){
+		//get all pending messages
+		if ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0, p->ai_addr, &p->ai_addrlen)) != -1) { //NULL, NULL
+			buf[numbytes] = '\0';
+			printf("%s\n", buf);
+		}
+	}
 }
