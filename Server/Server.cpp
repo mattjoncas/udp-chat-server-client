@@ -29,7 +29,6 @@ bool Server::Init(){
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
 		return false;
 	}
-	// loop through all the results and bind to the first we can
 	for(p = servinfo; p != NULL; p = p->ai_next) {
 		if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
 			perror("socket\n");
@@ -86,7 +85,7 @@ bool Server::Update(){
 		printf("Client left.\n");
 		for (int i = 0; i < clients.size(); i++){
 			if(CompareClients(&clients[i], (struct sockaddr *)&their_addr)){					
-				clients.erase(clients.begin() + 1);
+				clients.erase(clients.begin() + i);
 				break;
 			}
 		}
